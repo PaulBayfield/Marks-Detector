@@ -93,7 +93,7 @@ class CAS:
         
 
 
-    async def getTokenData(self, url: str):
+    async def getTokenData(self, url: str) -> str:
         """
         Permet de récupérer le token d'authentification
         
