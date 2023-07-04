@@ -1,0 +1,1 @@
+Authentification de l'intranet de l'IUT RCC en Python. Permet de récupérer toutes les notes et coefficients de toutes les matières.
