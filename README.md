@@ -41,3 +41,8 @@ async def main():
 asyncio.run(main())
 ```
 [Example dans le fichier main.py](main.py)
+
+
+# Credits
+
+Merci à [LockBlock-dev](https://github.com/LockBlock-dev) pour la première version, faite en JavaScript.
