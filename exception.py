@@ -12,5 +12,5 @@ class UnknownError(Exception):
 
 class NotConnected(Exception):
     def __init__(self):
-        self.error = "Aucune session n'est actuellement ouverte ! Merci d'utiliser la méthode profile après avoir utilisé la méthode login."
+        self.error = "Aucune session n'est actuellement ouverte ! Merci d'utiliser la méthode profil après avoir utilisé la méthode login."
         super().__init__(self.error)

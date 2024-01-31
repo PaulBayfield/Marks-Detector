@@ -3,10 +3,9 @@ from config import config
 from exception import UnknownError
 
 
-from requests import Response, request
-
 from bs4 import BeautifulSoup
 from typing import Union
+from aiohttp import ClientSession, ClientResponse
 
 
 class CAS:
@@ -18,7 +17,7 @@ class CAS:
         }
 
 
-    def request(self, url: str, method: str, data: dict = None, headers: dict = None, redirect: bool = True, raw: bool = False) -> Union[Response, dict, str]:
+    async def request(self, url: str, method: str, data: dict = None, headers: dict = None, redirect: bool = True, raw: bool = False) -> Union[ClientResponse, dict, str]:
         """
         Permet d'effectuer une requête HTTP avec la session courante
 
@@ -35,15 +34,15 @@ class CAS:
         else:
             hd = self.headers
 
-        response = request(method=method, url=url, data=data, headers=hd, allow_redirects=redirect)
-
-        if raw:
-            return response
-
-        try:
-            return response.json()
-        except:
-            return response.text
+        async with ClientSession() as session:
+            async with session.request(method, url, data=data, headers=hd, allow_redirects=redirect) as response:
+                if raw:
+                    return response
+                else:
+                    try:
+                        return await response.json()
+                    except:
+                        return await response.text()
 
     
     async def createSession(self, SERVICE_URL: str, redirectURL: str) -> bool:
@@ -53,7 +52,7 @@ class CAS:
         :param redirectURL: URL de redirection
         :return: Un booleen indiquant si la connection a reussi
         """
-        resp = self.request(
+        resp = await self.request(
             url=redirectURL,
             method="GET",
             redirect=False,
@@ -68,7 +67,7 @@ class CAS:
                 "Cookie": PHPSESSID
             }
 
-            resp2 = self.request(
+            resp2 = await self.request(
                 url=SERVICE_URL,
                 method="GET",
                 headers=headers,
@@ -90,7 +89,6 @@ class CAS:
                 raise UnknownError("Impossible de récupérer le cookie PHPSESSID ! (2eme requête)")
         else:
             raise UnknownError("Impossible de récupérer le cookie PHPSESSID ! (1ere requête)")
-        
 
 
     async def getTokenData(self, url: str) -> str:
@@ -100,16 +98,14 @@ class CAS:
         :param url: URL de la requête
         :return: Token d'authentification
         """
-        resp = self.request(
+        resp = await self.request(
             url=url,
-            method="GET",
-            raw=True
+            method="GET"
         )
 
-        b = BeautifulSoup(resp.text, "html.parser")
+        b = BeautifulSoup(resp, "html.parser")
         data = b.find_all("input", {"type": "hidden"})
         if len(data) > 0:
             return str(data[0]).split("value=\"")[1].split("\"/>")[0]
         else:
             UnknownError("Impossible de récupérer le token d'authentification !")
-    

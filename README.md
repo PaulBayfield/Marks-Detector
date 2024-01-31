@@ -35,7 +35,7 @@ async def main():
     client = Client("https://iut-rcc-intranet.univ-reims.fr/sso/cas")
     status = await client.login(USERNAME, PASSWORD)
     if status:
-        profil = await client.profile()
+        profil = await client.profil()
         print("Connexion réussie !\n\nConnecté en tant que", profil, "\n\n")
 
 asyncio.run(main())
